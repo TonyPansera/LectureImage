@@ -94,9 +94,60 @@ namespace LectureImage
             }
         }
 
-        public void DetectionContourPrewitt()
+        static byte[] RotateImage(byte[] imageData, double angleDegrees)
         {
+            // Convertir l'angle de degrés en radians
+            double angleRadians = angleDegrees * Math.PI / 180.0;
 
+            // Extraire la largeur et la hauteur de l'image à partir des métadonnées
+            int width = BitConverter.ToInt32(imageData, 18);
+            int height = BitConverter.ToInt32(imageData, 22);
+
+            // Calculer le centre de l'image
+            double centerX = width / 2.0;
+            double centerY = height / 2.0;
+
+            // Créer une nouvelle image pour stocker les pixels tournés
+            byte[] rotatedImageData = new byte[imageData.Length];
+            Array.Copy(imageData, rotatedImageData, imageData.Length);
+
+            // Remplir l'image avec une couleur de fond (noir)
+            for (int i = 54; i < imageData.Length; i += 3)
+            {
+                rotatedImageData[i] = 0;     // Bleu
+                rotatedImageData[i + 1] = 0; // Vert
+                rotatedImageData[i + 2] = 0; // Rouge
+            }
+
+            // Parcourir chaque pixel de l'image d'origine
+            for (int y = 0; y < height; y++)
+            {
+                for (int x = 0; x < width; x++)
+                {
+                    // Coordonnées polaires par rapport au centre de l'image
+                    double radius = Math.Sqrt(Math.Pow(x - centerX, 2) + Math.Pow(y - centerY, 2));
+                    double theta = Math.Atan2(y - centerY, x - centerX);
+
+                    // Effectuer la rotation
+                    double newTheta = theta + angleRadians;
+
+                    // Nouvelles coordonnées cartésiennes
+                    int newX = (int)(radius * Math.Cos(newTheta) + centerX);
+                    int newY = (int)(radius * Math.Sin(newTheta) + centerY);
+
+                    // Vérifier que les nouvelles coordonnées sont à l'intérieur de l'image
+                    if (newX >= 0 && newX < width && newY >= 0 && newY < height)
+                    {
+                        // Copier la couleur du pixel d'origine vers sa nouvelle position
+                        for (int i = 0; i < 3; i++)
+                        {
+                            rotatedImageData[54 + (newY * width + newX) * 3 + i] = imageData[54 + (y * width + x) * 3 + i];
+                        }
+                    }
+                }
+            }
+
+            return rotatedImageData;
         }
 
         static int[,] AgrandirMatrice(int nombre, int[,] matrice)
