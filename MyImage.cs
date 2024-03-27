@@ -117,33 +117,6 @@ namespace LectureImage
             return mat;
         }
 
-        //public static Bitmap Rotate(Bitmap image, float angle)
-        //{
-        //    Matrix matrice = new Matrix();
-        //    matrice.Rotate(angle);
-        //    PointF[] points = { new PointF(0, 0), new PointF(image.Width, 0), new PointF(0, image.Height), new PointF(image.Width, image.Height) };
-        //    matrice.TransformPoints(points);
-        //    float minX = points.Min(p => p.X);
-        //    float maxX = points.Max(p => p.X);
-        //    float minY = points.Min(p => p.Y);
-        //    float maxY = points.Max(p => p.Y);
-        //    int Largeur = (int)Math.Round(maxX - minX, MidpointRounding.AwayFromZero);
-        //    int Hauteur = (int)Math.Round(maxY - minY, MidpointRounding.AwayFromZero);
-
-
-        //    Bitmap image_rot = new Bitmap(Largeur, Hauteur);
-
-
-        //    using (Graphics rotatedGraphics = Graphics.FromImage(image_rot))
-        //    {
-        //        rotatedGraphics.TranslateTransform(image_rot.Width / 2, image_rot.Height / 2);
-        //        rotatedGraphics.RotateTransform(angle);
-        //        rotatedGraphics.DrawImage(image, -image.Width / 2, -image.Height / 2);
-        //    }
-
-        //    return image_rot;
-        //}
-
         public void FlouUniforme()
         {
             int[,] noyau = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
@@ -163,7 +136,27 @@ namespace LectureImage
 
         public void DetectionContour()
         {
-            int[,] noyau = { { 1, 0, -1 }, { 0, 0, 0 }, { -1, 0, 1 } };
+            (byte, byte, byte)[,] matrice1 = matrice;
+            (byte, byte, byte)[,] matrice2 = matrice;
+
+            for (int i = 0; i < matrice.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrice.GetLength(1); j++)
+                {
+                    byte r = (byte) Math.Sqrt(Math.Pow(matrice1[i, j].Item1, 2)
+                                + Math.Pow(matrice2[i, j].Item1, 2));
+                    byte g = (byte)Math.Sqrt(Math.Pow(matrice1[i, j].Item2, 2)
+                                + Math.Pow(matrice2[i, j].Item2, 2));
+                    byte b = (byte)Math.Sqrt(Math.Pow(matrice1[i, j].Item3, 2)
+                                + Math.Pow(matrice2[i, j].Item3, 2));
+                    matrice[i,j] = (r, g, b);
+                }
+            }
+        }
+
+        public void DetectionContourX((byte, byte, byte)[,] matrice1)
+        {
+            int[,] noyau = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
             (byte, byte, byte)[,] matriceCopy = matrice;
 
             for (int i = 0; i < matriceCopy.GetLength(0); i++)
@@ -173,7 +166,24 @@ namespace LectureImage
                     (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
 
                     (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 1);
-                    matrice[i, j] = nouveauPixel;
+                    matrice1[i, j] = nouveauPixel;
+                }
+            }
+        }
+
+        public void DetectionContourY((byte, byte, byte)[,] matrice2)
+        {
+            int[,] noyau = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
+            (byte, byte, byte)[,] matriceCopy = matrice;
+
+            for (int i = 0; i < matriceCopy.GetLength(0); i++)
+            {
+                for (int j = 0; j < matriceCopy.GetLength(1); j++)
+                {
+                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
+
+                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 1);
+                    matrice2[i, j] = nouveauPixel;
                 }
             }
         }
