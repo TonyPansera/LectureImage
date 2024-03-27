@@ -136,6 +136,7 @@ namespace LectureImage
 
         public void DetectionContour()
         {
+            this.Smoothing();
             (byte, byte, byte)[,] matrice1 = matrice;
             (byte, byte, byte)[,] matrice2 = matrice;
 
@@ -154,6 +155,23 @@ namespace LectureImage
             }
         }
 
+        public void Smoothing()
+        {
+            int[,] noyau = { { 2, 4, 5, 4, 2 }, { 4, 9, 12, 9, 4 }, { 5, 12, 15, 12, 5 },
+            { 4, 9, 12, 9, 4 }, { 2, 4, 5, 4, 2 }};
+            (byte, byte, byte)[,] matriceCopy = matrice;
+
+            for (int i = 0; i < matriceCopy.GetLength(0); i++)
+            {
+                for (int j = 0; j < matriceCopy.GetLength(1); j++)
+                {
+                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice5x5(matriceCopy, i, j);
+
+                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 159);
+                    matrice[i, j] = nouveauPixel;
+                }
+            }
+        }
         public void DetectionContourX((byte, byte, byte)[,] matrice1)
         {
             int[,] noyau = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
@@ -232,6 +250,28 @@ namespace LectureImage
             {
                 indexX = 0;
                 for (int l = j - 1; l <= j + 1; l++)
+                {
+                    if (k >= 0 && k < matriceCopy.GetLength(0)
+                        && l >= 0 && l < matriceCopy.GetLength(1))
+                    {
+                        matriceExtraite[indexY, indexX] = matriceCopy[k, l];
+                    }
+                    indexX++;
+                }
+                indexY++;
+            }
+            return matriceExtraite;
+        }
+
+        public (byte, byte, byte)[,] ExtraireMatrice5x5((byte, byte, byte)[,] matriceCopy, int i, int j)
+        {
+            (byte, byte, byte)[,] matriceExtraite = new (byte, byte, byte)[5, 5];
+            int indexX = 0;
+            int indexY = 0;
+            for (int k = i - 2; k <= i + 2; k++)
+            {
+                indexX = 0;
+                for (int l = j - 2; l <= j + 2; l++)
                 {
                     if (k >= 0 && k < matriceCopy.GetLength(0)
                         && l >= 0 && l < matriceCopy.GetLength(1))
