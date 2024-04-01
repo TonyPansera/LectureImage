@@ -64,8 +64,8 @@ namespace LectureImage
             enteteDecimal[3] = tailleEnteteImage;
             enteteDecimal[4] = largeur;
             enteteDecimal[5] = hauteur;
-            Console.WriteLine("largeur" + largeur);
-            Console.WriteLine("hauteur" + hauteur);
+            //Console.WriteLine("largeur" + largeur);
+            //Console.WriteLine("hauteur" + hauteur);
             enteteDecimal[6] = nombrePlanImage;
             enteteDecimal[7] = nombreBitParCouleur;
             enteteDecimal[8] = typeCompression;
@@ -76,7 +76,7 @@ namespace LectureImage
             enteteDecimal[13] = nombreCouleursImportantes;
 
             offset = (tailleFichier - imageOffsetEntete) % 4;
-            Console.WriteLine("offset " + offset);
+            //Console.WriteLine("offset " + offset);
 
             // Initialisation matrice
             matrice = new (byte, byte, byte)[hauteur + offset, largeur + offset];
@@ -94,35 +94,22 @@ namespace LectureImage
             }
         }
 
-        static byte[] RotateImage(byte[] imageData, double angleDegrees)
+        public void RotateImage(double angleDegrees)
         {
             // Convertir l'angle de degrés en radians
             double angleRadians = angleDegrees * Math.PI / 180.0;
 
-            // Extraire la largeur et la hauteur de l'image à partir des métadonnées
-            int width = BitConverter.ToInt32(imageData, 18);
-            int height = BitConverter.ToInt32(imageData, 22);
+            // Créer une nouvelle matrice pour stocker les pixels tournés
+            (byte, byte, byte)[,] rotatedImageData = new (byte, byte, byte)[hauteur, largeur];
 
             // Calculer le centre de l'image
-            double centerX = width / 2.0;
-            double centerY = height / 2.0;
-
-            // Créer une nouvelle image pour stocker les pixels tournés
-            byte[] rotatedImageData = new byte[imageData.Length];
-            Array.Copy(imageData, rotatedImageData, imageData.Length);
-
-            // Remplir l'image avec une couleur de fond (noir)
-            for (int i = 54; i < imageData.Length; i += 3)
-            {
-                rotatedImageData[i] = 0;     // Bleu
-                rotatedImageData[i + 1] = 0; // Vert
-                rotatedImageData[i + 2] = 0; // Rouge
-            }
+            double centerX = largeur / 2;
+            double centerY = hauteur / 2;
 
             // Parcourir chaque pixel de l'image d'origine
-            for (int y = 0; y < height; y++)
+            for (int y = 0; y < hauteur; y++)
             {
-                for (int x = 0; x < width; x++)
+                for (int x = 0; x < largeur; x++)
                 {
                     // Coordonnées polaires par rapport au centre de l'image
                     double radius = Math.Sqrt(Math.Pow(x - centerX, 2) + Math.Pow(y - centerY, 2));
@@ -136,18 +123,14 @@ namespace LectureImage
                     int newY = (int)(radius * Math.Sin(newTheta) + centerY);
 
                     // Vérifier que les nouvelles coordonnées sont à l'intérieur de l'image
-                    if (newX >= 0 && newX < width && newY >= 0 && newY < height)
+                    if (newX >= 0 && newX < largeur && newY >= 0 && newY < hauteur)
                     {
                         // Copier la couleur du pixel d'origine vers sa nouvelle position
-                        for (int i = 0; i < 3; i++)
-                        {
-                            rotatedImageData[54 + (newY * width + newX) * 3 + i] = imageData[54 + (y * width + x) * 3 + i];
-                        }
+                        rotatedImageData[newY, newX] = matrice[y, x];
                     }
                 }
             }
-
-            return rotatedImageData;
+            matrice = rotatedImageData;
         }
 
         static int[,] AgrandirMatrice(int nombre, int[,] matrice)
@@ -223,6 +206,7 @@ namespace LectureImage
                 }
             }
         }
+
         public void DetectionContourX((byte, byte, byte)[,] matrice1)
         {
             int[,] noyau = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
@@ -387,7 +371,7 @@ namespace LectureImage
             int taille = (matrice.GetLength(1) * matrice.GetLength(0) * 3) + 54;
             byte[] newFile = new byte[taille];
             int k = 0;
-            Console.WriteLine("taille fichier : " + taille);
+            //Console.WriteLine("taille fichier : " + taille);
 
             // Mettre le type de fichier dans les 2 premières cases (2 octets)
             newFile[k] = 66;
@@ -402,7 +386,7 @@ namespace LectureImage
                 for(int j = endian.Length-1; j >= 0; j--)
                 {
                     newFile[k] = endian[j];
-                    Console.WriteLine(k + " = " + endian[j]);
+                    //Console.WriteLine(k + " = " + endian[j]);
                     k++;
                     
                 }
@@ -411,21 +395,21 @@ namespace LectureImage
             byte[] endian1 = Convertir_Int_to_Endian_2(enteteDecimal[6]);
                 
             newFile[k] = endian1[endian1.Length-1];
-            Console.WriteLine(k + " = " + newFile[k]);
+            //Console.WriteLine(k + " = " + newFile[k]);
             k++;
 
             newFile[k] = endian1[endian1.Length - 2];
-            Console.WriteLine(k + " = " + newFile[k]);
+            //Console.WriteLine(k + " = " + newFile[k]);
             k++;
 
             byte[] endian2 = Convertir_Int_to_Endian_2(enteteDecimal[7]);
 
             newFile[k] = endian2[endian2.Length - 1];
-            Console.WriteLine(k + " = " + newFile[k]);
+            //Console.WriteLine(k + " = " + newFile[k]);
             k++;
 
             newFile[k] = endian2[endian2.Length - 2];
-            Console.WriteLine(k + " = " + newFile[k]);
+            //Console.WriteLine(k + " = " + newFile[k]);
             k++;
 
             for (int i = 8; i <= 13; i++)
@@ -434,7 +418,7 @@ namespace LectureImage
                 for (int j = endian.Length - 1; j >= 0; j--)
                 {
                     newFile[k] = endian[j];
-                    Console.WriteLine(k + " = " + endian[j]);
+                    //Console.WriteLine(k + " = " + endian[j]);
                     k++;
                     
                 }

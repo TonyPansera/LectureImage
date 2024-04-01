@@ -48,8 +48,8 @@ namespace LectureImage
             */
 
             MyImage image = new MyImage("./Images/Coco.bmp");
-            image.DetectionContour();
-            Console.WriteLine(image.toString());
+            image.RotateImage(20.0);
+            //Console.WriteLine(image.toString());
             byte[] myFile = image.From_Image_To_File();
 
             File.WriteAllBytes("Sortie.bmp", myFile);
