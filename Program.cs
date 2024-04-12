@@ -48,7 +48,8 @@ namespace LectureImage
             */
 
             MyImage image = new MyImage("./Images/Coco.bmp");
-            image.RotateImage(20.0);
+            image.NoirEtBlanc();
+            image.Repoussage();
             //Console.WriteLine(image.toString());
             byte[] myFile = image.From_Image_To_File();
 

@@ -119,8 +119,8 @@ namespace LectureImage
                     double newTheta = theta + angleRadians;
 
                     // Nouvelles coordonnées cartésiennes
-                    int newX = (int)(radius * Math.Cos(newTheta) + centerX);
-                    int newY = (int)(radius * Math.Sin(newTheta) + centerY);
+                    int newX = (int) (radius * Math.Cos(newTheta) + centerX);
+                    int newY = (int) (radius * Math.Sin(newTheta) + centerY);
 
                     // Vérifier que les nouvelles coordonnées sont à l'intérieur de l'image
                     if (newX >= 0 && newX < largeur && newY >= 0 && newY < hauteur)
@@ -130,6 +130,19 @@ namespace LectureImage
                     }
                 }
             }
+            //for(int i = 0; i < hauteur; i++) {
+            //    for(int j = 0; j < largeur; j++)
+            //    {
+                    
+            //        for(int k = (i - 2 >= 0) ? i - 2 : (i - 1 >= 0) ? i - 1 : i; 
+            //            i < hauteur || i <) { 
+            //            for(int l = (j - 2 >= 0) ? j - 2 : (j - 1 >= 0) ? j - 1 : j)
+            //            {
+
+            //            }
+            //        }
+            //    }
+            //}
             matrice = rotatedImageData;
         }
 
@@ -149,6 +162,55 @@ namespace LectureImage
                 }
             }
             return mat;
+        }
+
+        public void NoirEtBlanc()
+        {
+            (byte, byte, byte)[,] matriceCopy = matrice;
+
+            for (int i = 0; i < matriceCopy.GetLength(0); i++)
+            {
+                for (int j = 0; j < matriceCopy.GetLength(1); j++)
+                {
+                    byte moyenne = (byte) (matrice[i, j].Item1 + matrice[i, j].Item2 + matrice[i, j].Item3);
+                    moyenne /= 3;
+                    (byte, byte, byte) nouveauPixel = (moyenne, moyenne, moyenne);
+                    matrice[i, j] = nouveauPixel;
+                }
+            }
+        }
+        public void Repoussage()
+        {
+            int[,] noyau = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
+            (byte, byte, byte)[,] matriceCopy = matrice;
+
+            for (int i = 0; i < matriceCopy.GetLength(0); i++)
+            {
+                for (int j = 0; j < matriceCopy.GetLength(1); j++)
+                {
+                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
+
+                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 4);
+                    matrice[i, j] = nouveauPixel;
+                }
+            }
+        }
+
+        public void RenforcementBords()
+        {
+            int[,] noyau = { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
+            (byte, byte, byte)[,] matriceCopy = matrice;
+
+            for (int i = 0; i < matriceCopy.GetLength(0); i++)
+            {
+                for (int j = 0; j < matriceCopy.GetLength(1); j++)
+                {
+                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
+
+                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 1);
+                    matrice[i, j] = nouveauPixel;
+                }
+            }
         }
 
         public void FlouUniforme()
@@ -241,10 +303,10 @@ namespace LectureImage
             }
         }
 
-        public (byte, byte, byte) CalculerNouveauPixel((byte, byte, byte)[,] matriceExtraite, int[,] noyau, int div)
+        public (byte, byte, byte) CalculerNouveauPixel((byte, byte, byte)[,] matriceExtraite, int[,] noyau, double div)
         {
 
-            int sum1 = 0;
+            double sum1 = 0;
             for (int k = 0; k < matriceExtraite.GetLength(0); k++)
             {
                 for (int l = 0; l < matriceExtraite.GetLength(1); l++)
@@ -252,7 +314,7 @@ namespace LectureImage
                     sum1 += matriceExtraite[k, l].Item1 * noyau[k, l];
                 }
             }
-            int sum2 = 0;
+            double sum2 = 0;
             for (int k = 0; k < matriceExtraite.GetLength(0); k++)
             {
                 for (int l = 0; l < matriceExtraite.GetLength(1); l++)
@@ -260,7 +322,7 @@ namespace LectureImage
                     sum2 += matriceExtraite[k, l].Item2 * noyau[k, l];
                 }
             }
-            int sum3 = 0;
+            double sum3 = 0;
             for (int k = 0; k < matriceExtraite.GetLength(0); k++)
             {
                 for (int l = 0; l < matriceExtraite.GetLength(1); l++)
