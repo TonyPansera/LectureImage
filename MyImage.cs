@@ -144,32 +144,53 @@ namespace LectureImage
             }
         }
 
+        /// <summary>
+        /// Créaction de la fractale de Mandelbrot dans la matrice
+        /// </summary>
         public void Fractale()
         {
             int nombreIterationMax = 75;
 
             // Nombres complexes
-            (double, double) c, z;
+            (double, double) z1, z2;
+
+            // Variable temporaire
             double varTemp;
+
+            // Nombre d'itération
             int k;
+
+            // Module du nombre complexe z2
             double moduleZ;
+
+            // Parcours de chaque pixel de la matrice
             for (int i = 0; i < hauteur; i++)
             {
                 for (int j = 0; j < largeur; j++)
                 {
-                    c = ((double)j / largeur * 4 - 2, (double)i / hauteur * 4 - 2);
-                    z = (0, 0);
+                    // Convertion en coordonnées complexes
+                    z1 = ((double)j / largeur * 4 - 2, (double)i / hauteur * 4 - 2);
+
+                    // Initialisation à l'origine
+                    z2 = (0, 0);
                     k = 0;
 
+                    // Calculer le nombre d'itération avant divergence
                     do
                     {
-                        varTemp = z.Item1;
-                        z = (z.Item1 * z.Item1 - z.Item2 * z.Item2 + c.Item1, 2 * z.Item2 * varTemp + c.Item2);
-                        moduleZ = Math.Sqrt(z.Item1 * z.Item1 + z.Item2 * z.Item2);
+                        // Conservation de la partie réelle
+                        varTemp = z2.Item1;
+
+                        // Algorithme
+                        z2 = (z2.Item1 * z2.Item1 - z2.Item2 * z2.Item2 + z1.Item1, 2 * z2.Item2 * varTemp + z1.Item2);
+
+                        // Calcul du module + itération
+                        moduleZ = Math.Sqrt(z2.Item1 * z2.Item1 + z2.Item2 * z2.Item2);
                         k++;
                     } while (moduleZ < 2 && k < nombreIterationMax);
 
-                    matrice[i,j] = (Convert.ToByte(k * 255 / nombreIterationMax), 0, 0);
+                    // On met la couleur dans la matrice (plus il y a d'itérations, plus la valeur de la couleur est basse)
+                    matrice[i,j] = (Convert.ToByte(k * 255 / nombreIterationMax), Convert.ToByte(k * 255 / nombreIterationMax), 100);
                 }
             }
         }
@@ -439,7 +460,7 @@ namespace LectureImage
 
         public byte[] Convertir_Int_to_Endian_4(int number)
         {
-            // source : https://maxo.blog/c-sharp-convert-int-to-byte-array/ 
+            // source : https://maxo.blog/z1-sharp-convert-int-to-byte-array/ 
             byte[] tab = new byte[4];
             if (number > 0)
             {
@@ -454,7 +475,7 @@ namespace LectureImage
 
         public byte[] Convertir_Int_to_Endian_2(int number)
         {
-            // source : https://maxo.blog/c-sharp-convert-int-to-byte-array/ 
+            // source : https://maxo.blog/z1-sharp-convert-int-to-byte-array/ 
             byte[] tab = new byte[2];
             if (number > 0)
             {
