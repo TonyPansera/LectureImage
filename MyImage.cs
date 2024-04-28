@@ -10,7 +10,7 @@ namespace LectureImage
 {
     internal class MyImage
     {
-        
+
         private int offset;
 
         // Entete fichier
@@ -37,6 +37,11 @@ namespace LectureImage
 
         // Matrice
         private (byte, byte, byte)[,] matrice;
+
+        /// <summary>
+        /// Constructeur lors d'une extraction d'image
+        /// </summary>
+        /// <param name="myFile"></param>
         public MyImage(string myFile)
         {
             byte[] file = File.ReadAllBytes(myFile);
@@ -81,15 +86,90 @@ namespace LectureImage
             // Initialisation matrice
             matrice = new (byte, byte, byte)[hauteur + offset, largeur + offset];
 
+            for(int j = 0; j < enteteDecimal.Length; j++)
+            {
+                Console.WriteLine(j + " " + enteteDecimal[j]);
+            }
 
             int i = 54;
-            for(int j = 0; j < matrice.GetLength(0); j++)
+            for (int j = 0; j < matrice.GetLength(0); j++)
             {
-                for(int k = 0; k < matrice.GetLength(1) && i+3 < tailleImage; k++)
+                for (int k = 0; k < matrice.GetLength(1) && i + 3 < tailleImage; k++)
                 {
-                    (byte, byte, byte) color = (file[i], file[i+1], file[i+2]);
+                    (byte, byte, byte) color = (file[i], file[i + 1], file[i + 2]);
                     i += 3;
                     matrice[j, k] = color;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Constructeur lors de la création d'une fractale
+        /// </summary>
+        /// <param name="taille"></param>
+        public MyImage(int taille)
+        {
+            // Entete fichier
+            typeImage = "BM";
+
+            hauteur = taille;
+            largeur = taille;
+            enteteDecimal[0] = taille * taille * 3 + 54;
+            enteteDecimal[1] = 0;
+            enteteDecimal[2] = 54;
+            enteteDecimal[3] = 40;
+            enteteDecimal[4] = taille;
+            enteteDecimal[5] = taille;
+            //Console.WriteLine("largeur" + largeur);
+            //Console.WriteLine("hauteur" + hauteur);
+            enteteDecimal[6] = 1;
+            enteteDecimal[7] = 24;
+            enteteDecimal[8] = 0;
+            enteteDecimal[9] = taille * taille * 3;
+            enteteDecimal[10] = 5000;
+            enteteDecimal[11] = 5000;
+            enteteDecimal[12] = 0;
+            enteteDecimal[13] = 0;
+
+            // Initialisation matrice
+            matrice = new (byte, byte, byte)[taille, taille];
+
+            int i = 54;
+            for (int j = 0; j < matrice.GetLength(0); j++)
+            {
+                for (int k = 0; k < matrice.GetLength(1); k++)
+                {
+                    matrice[j, k] = (255,255,255);
+                }
+            }
+        }
+
+        public void Fractale()
+        {
+            int nombreIterationMax = 75;
+
+            // Nombres complexes
+            (double, double) c, z;
+            double varTemp;
+            int k;
+            double moduleZ;
+            for (int i = 0; i < hauteur; i++)
+            {
+                for (int j = 0; j < largeur; j++)
+                {
+                    c = ((double)j / largeur * 4 - 2, (double)i / hauteur * 4 - 2);
+                    z = (0, 0);
+                    k = 0;
+
+                    do
+                    {
+                        varTemp = z.Item1;
+                        z = (z.Item1 * z.Item1 - z.Item2 * z.Item2 + c.Item1, 2 * z.Item2 * varTemp + c.Item2);
+                        moduleZ = Math.Sqrt(z.Item1 * z.Item1 + z.Item2 * z.Item2);
+                        k++;
+                    } while (moduleZ < 2 && k < nombreIterationMax);
+
+                    matrice[i,j] = (Convert.ToByte(k * 255 / nombreIterationMax), 0, 0);
                 }
             }
         }
@@ -248,6 +328,7 @@ namespace LectureImage
             }
             matrice = matriceCopy;
         }
+
         public void FlouUniforme()
         {
             int[,] noyau = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
