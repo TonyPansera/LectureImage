@@ -10,7 +10,6 @@ namespace LectureImage
 {
     internal class MyImage
     {
-
         private int offset;
 
         // Entete fichier
@@ -37,6 +36,7 @@ namespace LectureImage
 
         // Matrice
         private (byte, byte, byte)[,] matrice;
+        private (byte, byte, byte)[,] matriceModifiee;
 
         public (byte, byte, byte)[,] Matrice
         {
@@ -90,6 +90,7 @@ namespace LectureImage
 
             // Initialisation matrice
             matrice = new (byte, byte, byte)[hauteur + offset, largeur + offset];
+
 
             for(int j = 0; j < enteteDecimal.Length; j++)
             {
@@ -388,22 +389,30 @@ namespace LectureImage
         /// <param name="nombre"></param>
         /// <param name="matrice"></param>
         /// <returns></returns>
-        static int[,] AgrandirMatrice(int nombre, int[,] matrice)
+        public void AgrandirMatrice(int nombre)
         {
-            int[,] mat = null;
+            (byte, byte, byte)[,] mat = null;
             if (nombre > 0)
             {
-                mat = new int[matrice.GetLength(0) * nombre, matrice.GetLength(1) * nombre];
+                mat = new (byte, byte, byte)[matrice.GetLength(0) * nombre, matrice.GetLength(1) * nombre];
                 for (int i = 0; i < nombre * matrice.GetLength(0); i++)
                 {
                     for (int j = 0; j < nombre * matrice.GetLength(1); j++)
                     {
                         mat[i, j] = matrice[i / nombre, j / nombre];
                     }
-
                 }
+                tailleFichier = mat.GetLength(0) * mat.GetLength(1) * 3 + 54;
+                hauteur = mat.GetLength(0);
+                largeur = mat.GetLength(1);
+                tailleImage = tailleFichier - 54;
+
+                enteteDecimal[0] = tailleFichier;
+                enteteDecimal[4] = largeur;
+                enteteDecimal[5] = hauteur;
+                enteteDecimal[9] = tailleImage;
+                matrice = mat;
             }
-            return mat;
         }
 
         /// <summary>
@@ -709,7 +718,6 @@ namespace LectureImage
             result += "Taille image : " + tailleImage + "\n";
             return result;
         }
-
 
     }
 }
