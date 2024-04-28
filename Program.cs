@@ -47,9 +47,12 @@ namespace LectureImage
             0 0 4 230 = 230*250^0 + 4*256^1+0*256^2+0*256^3
             */
 
-            MyImage image = new MyImage("./Images/Coco.bmp");
-            image.NoirEtBlanc();
-            image.Repoussage();
+            MyImage image = new MyImage("./Images/Lac.bmp");
+            //image.NoirEtBlanc();
+            //image.DetectionContour();
+            //image.FlouUniforme();
+            //image.Repoussage();
+            image.RenforcementBords();
             //Console.WriteLine(image.toString());
             byte[] myFile = image.From_Image_To_File();
 

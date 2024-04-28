@@ -94,6 +94,10 @@ namespace LectureImage
             }
         }
 
+        /// <summary>
+        /// Tourne l'image selon un certain angle
+        /// </summary>
+        /// <param name="angleDegrees"></param>
         public void RotateImage(double angleDegrees)
         {
             // Convertir l'angle de degrés en radians
@@ -146,6 +150,12 @@ namespace LectureImage
             matrice = rotatedImageData;
         }
 
+        /// <summary>
+        /// Agrandit l'image selon un certain coefficient
+        /// </summary>
+        /// <param name="nombre"></param>
+        /// <param name="matrice"></param>
+        /// <returns></returns>
         static int[,] AgrandirMatrice(int nombre, int[,] matrice)
         {
             int[,] mat = null;
@@ -164,6 +174,9 @@ namespace LectureImage
             return mat;
         }
 
+        /// <summary>
+        /// Transforme l'image en noir et blanc
+        /// </summary>
         public void NoirEtBlanc()
         {
             (byte, byte, byte)[,] matriceCopy = matrice;
@@ -172,167 +185,109 @@ namespace LectureImage
             {
                 for (int j = 0; j < matriceCopy.GetLength(1); j++)
                 {
-                    byte moyenne = (byte) (matrice[i, j].Item1 + matrice[i, j].Item2 + matrice[i, j].Item3);
-                    moyenne /= 3;
+                    byte moyenne = (byte) (matriceCopy[i, j].Item1 * 0.21 
+                        + matriceCopy[i, j].Item2 * 0.72
+                        + matriceCopy[i, j].Item3 * 0.07);
                     (byte, byte, byte) nouveauPixel = (moyenne, moyenne, moyenne);
                     matrice[i, j] = nouveauPixel;
                 }
             }
         }
+
         public void Repoussage()
         {
             int[,] noyau = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
-            (byte, byte, byte)[,] matriceCopy = matrice;
+            (byte, byte, byte)[,] matriceCopy = new (byte, byte, byte)[matrice.GetLength(0), matrice.GetLength(1)];
 
             for (int i = 0; i < matriceCopy.GetLength(0); i++)
             {
                 for (int j = 0; j < matriceCopy.GetLength(1); j++)
                 {
-                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
+                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matrice, i, j);
 
-                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 4);
-                    matrice[i, j] = nouveauPixel;
+                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 1);
+                    matriceCopy[i, j] = nouveauPixel;
                 }
             }
+            matrice = matriceCopy;
         }
 
         public void RenforcementBords()
         {
             int[,] noyau = { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
-            (byte, byte, byte)[,] matriceCopy = matrice;
+            (byte, byte, byte)[,] matriceCopy = new (byte, byte, byte)[matrice.GetLength(0), matrice.GetLength(1)];
 
             for (int i = 0; i < matriceCopy.GetLength(0); i++)
             {
                 for (int j = 0; j < matriceCopy.GetLength(1); j++)
                 {
-                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
-
-                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 1);
-                    matrice[i, j] = nouveauPixel;
-                }
-            }
-        }
-
-        public void FlouUniforme()
-        {
-            int[,] noyau = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
-            (byte, byte, byte)[,] matriceCopy = matrice;
-
-            for (int i = 0; i < matriceCopy.GetLength(0); i++)
-            {
-                for(int j = 0; j < matriceCopy.GetLength(1); j++)
-                {
-                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
+                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matrice, i, j);
 
                     (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 9);
-                    matrice[i,j] = nouveauPixel;
+                    matriceCopy[i, j] = nouveauPixel;
                 }
             }
+            matrice = matriceCopy;
         }
+
 
         public void DetectionContour()
         {
-            this.Smoothing();
-            (byte, byte, byte)[,] matrice1 = matrice;
-            (byte, byte, byte)[,] matrice2 = matrice;
-
-            for (int i = 0; i < matrice.GetLength(0); i++)
-            {
-                for (int j = 0; j < matrice.GetLength(1); j++)
-                {
-                    byte r = (byte) Math.Sqrt(Math.Pow(matrice1[i, j].Item1, 2)
-                                + Math.Pow(matrice2[i, j].Item1, 2));
-                    byte g = (byte)Math.Sqrt(Math.Pow(matrice1[i, j].Item2, 2)
-                                + Math.Pow(matrice2[i, j].Item2, 2));
-                    byte b = (byte)Math.Sqrt(Math.Pow(matrice1[i, j].Item3, 2)
-                                + Math.Pow(matrice2[i, j].Item3, 2));
-                    matrice[i,j] = (r, g, b);
-                }
-            }
-        }
-
-        public void Smoothing()
-        {
-            int[,] noyau = { { 2, 4, 5, 4, 2 }, { 4, 9, 12, 9, 4 }, { 5, 12, 15, 12, 5 },
-            { 4, 9, 12, 9, 4 }, { 2, 4, 5, 4, 2 }};
-            (byte, byte, byte)[,] matriceCopy = matrice;
+            int[,] noyau = { { -1, -1, -1 }, { -1, 8, -1 }, { -1, -1, -1 } };
+            (byte, byte, byte)[,] matriceCopy = new (byte, byte, byte)[matrice.GetLength(0), matrice.GetLength(1)];
 
             for (int i = 0; i < matriceCopy.GetLength(0); i++)
             {
                 for (int j = 0; j < matriceCopy.GetLength(1); j++)
                 {
-                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice5x5(matriceCopy, i, j);
+                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matrice, i, j);
 
-                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 159);
-                    matrice[i, j] = nouveauPixel;
+                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 46);
+                    matriceCopy[i, j] = nouveauPixel;
                 }
             }
+            matrice = matriceCopy;
         }
-
-        public void DetectionContourX((byte, byte, byte)[,] matrice1)
+        public void FlouUniforme()
         {
-            int[,] noyau = { { -1, 0, 1 }, { -2, 0, 2 }, { -1, 0, 1 } };
-            (byte, byte, byte)[,] matriceCopy = matrice;
+            int[,] noyau = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
+            (byte, byte, byte)[,] matriceCopy = new (byte, byte, byte)[matrice.GetLength(0), matrice.GetLength(1)];
 
             for (int i = 0; i < matriceCopy.GetLength(0); i++)
             {
                 for (int j = 0; j < matriceCopy.GetLength(1); j++)
                 {
-                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
+                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matrice, i, j);
 
-                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 1);
-                    matrice1[i, j] = nouveauPixel;
+                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 9);
+                    matriceCopy[i, j] = nouveauPixel;
                 }
             }
-        }
-
-        public void DetectionContourY((byte, byte, byte)[,] matrice2)
-        {
-            int[,] noyau = { { 1, 2, 1 }, { 0, 0, 0 }, { -1, -2, -1 } };
-            (byte, byte, byte)[,] matriceCopy = matrice;
-
-            for (int i = 0; i < matriceCopy.GetLength(0); i++)
-            {
-                for (int j = 0; j < matriceCopy.GetLength(1); j++)
-                {
-                    (byte, byte, byte)[,] matriceExtraite = ExtraireMatrice(matriceCopy, i, j);
-
-                    (byte, byte, byte) nouveauPixel = CalculerNouveauPixel(matriceExtraite, noyau, 1);
-                    matrice2[i, j] = nouveauPixel;
-                }
-            }
+            matrice = matriceCopy;
         }
 
         public (byte, byte, byte) CalculerNouveauPixel((byte, byte, byte)[,] matriceExtraite, int[,] noyau, double div)
         {
-
             double sum1 = 0;
-            for (int k = 0; k < matriceExtraite.GetLength(0); k++)
-            {
-                for (int l = 0; l < matriceExtraite.GetLength(1); l++)
-                {
-                    sum1 += matriceExtraite[k, l].Item1 * noyau[k, l];
-                }
-            }
             double sum2 = 0;
-            for (int k = 0; k < matriceExtraite.GetLength(0); k++)
-            {
-                for (int l = 0; l < matriceExtraite.GetLength(1); l++)
-                {
-                    sum2 += matriceExtraite[k, l].Item2 * noyau[k, l];
-                }
-            }
             double sum3 = 0;
             for (int k = 0; k < matriceExtraite.GetLength(0); k++)
             {
                 for (int l = 0; l < matriceExtraite.GetLength(1); l++)
                 {
+                    sum1 += matriceExtraite[k, l].Item1 * noyau[k, l];
+                    sum2 += matriceExtraite[k, l].Item2 * noyau[k, l];
                     sum3 += matriceExtraite[k, l].Item3 * noyau[k, l];
                 }
             }
+            
             sum1 /= div;
             sum2 /= div;
             sum3 /= div;
+
+            sum1 = (sum1 > 255) ? 255 : sum1;
+            sum2 = (sum2 > 255) ? 255 : sum2;
+            sum3 = (sum3 > 255) ? 255 : sum3;
 
             (byte, byte, byte) nouveauPixel = ((byte)sum1, (byte)sum2, (byte)sum3);
             return nouveauPixel;
@@ -345,17 +300,21 @@ namespace LectureImage
             int indexY = 0;
             for (int k = i - 1; k <= i + 1; k++)
             {
-                indexX = 0;
+                indexY = 0;
                 for (int l = j - 1; l <= j + 1; l++)
                 {
                     if (k >= 0 && k < matriceCopy.GetLength(0)
                         && l >= 0 && l < matriceCopy.GetLength(1))
                     {
-                        matriceExtraite[indexY, indexX] = matriceCopy[k, l];
+                        matriceExtraite[indexX, indexY] = matrice[k, l];
                     }
-                    indexX++;
+                    else
+                    {
+                        matriceExtraite[indexX, indexY] = (0, 0, 0);
+                    }
+                    indexY++;
                 }
-                indexY++;
+                indexX++;
             }
             return matriceExtraite;
         }
