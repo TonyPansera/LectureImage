@@ -38,6 +38,11 @@ namespace LectureImage
         // Matrice
         private (byte, byte, byte)[,] matrice;
 
+        public (byte, byte, byte)[,] Matrice
+        {
+            get { return matrice; }
+        }
+
         /// <summary>
         /// Constructeur lors d'une extraction d'image
         /// </summary>
@@ -142,6 +147,132 @@ namespace LectureImage
                     matrice[j, k] = (255,255,255);
                 }
             }
+        }
+
+        public void RetrouverImage()
+        {
+            for (int i = 0; i < matrice.GetLength(0); i++)
+            {
+                for (int j = 0; j < matrice.GetLength(1); j++)
+                {
+                    // Rouge
+                    int last4BitsRedCache = matrice[i, j].Item1 & 0b1111;
+                    string binaryRepresentationRC = this.ConvertSemiByteToBinary(last4BitsRedCache);
+                    string pixelFinalR = binaryRepresentationRC + "0000";
+
+                    byte pixelFinalRByte = Convert.ToByte(pixelFinalR, 2);
+
+                    // Vert
+                    int last4BitsGCache = matrice[i, j].Item2 >> 0 & 0b1111;
+                    string binaryRepresentationGC = this.ConvertSemiByteToBinary(last4BitsGCache);
+                    string pixelFinalG = binaryRepresentationGC + "0000";
+
+                    byte pixelFinalGByte = Convert.ToByte(pixelFinalG, 2);
+
+                    // Bleu
+                    int last4BitsBCache = matrice[i, j].Item3 >> 0 & 0b1111;
+                    string binaryRepresentationBC = this.ConvertSemiByteToBinary(last4BitsBCache);
+                    string pixelFinalB = binaryRepresentationBC + "0000";
+
+                    byte pixelFinalBByte = Convert.ToByte(pixelFinalB, 2);
+
+                    matrice[i, j] = (pixelFinalRByte, pixelFinalGByte, pixelFinalBByte);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Cache une image dans une autre à partir de sa matrice
+        /// </summary>
+        /// <param name="matriceCachee"></param>
+        public void CacherImage((byte, byte, byte)[,] matriceCachee)
+        {
+            if(matriceCachee.GetLength(0) < matrice.GetLength(0) &&
+                matriceCachee.GetLength(1) < matrice.GetLength(1))
+            {
+                (byte, byte, byte)[,] nouveauMatriceCachee = new (byte, byte, byte)[matrice.GetLength(0), matrice.GetLength(1)];
+                for (int i = 0; i < matriceCachee.GetLength(0); i++)
+                {
+                    for(int j = 0; j < matriceCachee.GetLength(1); j++)
+                    {
+                        nouveauMatriceCachee[i,j] = matriceCachee[i, j];
+                    }
+                }
+
+                for (int i = 0; i < matrice.GetLength(0); i++)
+                {
+                    for(int j = 0; j < matrice.GetLength(1); j++)
+                    {
+                        // Rouge
+                        int last4BitsRedCache = nouveauMatriceCachee[i, j].Item1 >> 4;
+                        int first4BitsRed = matrice[i, j].Item1 >> 4;
+                        string binaryRepresentationRC = this.ConvertSemiByteToBinary(last4BitsRedCache);
+                        string binaryRepresentationR = this.ConvertSemiByteToBinary(first4BitsRed);
+                        string pixelFinalR = binaryRepresentationR + binaryRepresentationRC;
+
+                        byte pixelFinalRByte = this.ConvertBinaryToByte(pixelFinalR);
+
+                        // Vert
+                        int last4BitsGreenCache = nouveauMatriceCachee[i, j].Item2 >> 4;
+                        int first4BitsG = matrice[i, j].Item2 >> 4;
+                        string binaryRepresentationGC = this.ConvertSemiByteToBinary(last4BitsGreenCache);
+                        string binaryRepresentationG = this.ConvertSemiByteToBinary(first4BitsG);
+                        string pixelFinalG = binaryRepresentationG + binaryRepresentationGC;
+
+                        byte pixelFinalGByte = this.ConvertBinaryToByte(pixelFinalG);
+
+                        // Bleu
+                        int last4BitsBCache = nouveauMatriceCachee[i, j].Item3 >> 4;
+                        int first4BitsB = matrice[i, j].Item3 >> 4;
+                        string binaryRepresentationBC = this.ConvertSemiByteToBinary(last4BitsBCache);
+                        string binaryRepresentationB = this.ConvertSemiByteToBinary(first4BitsB);
+                        string pixelFinalB = binaryRepresentationB + binaryRepresentationBC;
+
+                        byte pixelFinalBByte = this.ConvertBinaryToByte(pixelFinalB);
+
+                        matrice[i, j] = (pixelFinalRByte, pixelFinalGByte, pixelFinalBByte);
+
+                    }
+                }
+            }
+        }
+        public string ConvertSemiByteToBinary(int value)
+        {
+            int valInt = Convert.ToInt32(value);
+
+            string result = "";
+            if (valInt >= 0 && valInt <= 15)
+            {
+                
+                for (int i = 3; i >= 0; i--)
+                {
+                    if (valInt >= Convert.ToInt32(Math.Pow(2, i)))
+                    {
+                        valInt -= Convert.ToInt32(Math.Pow(2, i));
+                        result += "1";
+                    }
+                    else
+                    {
+                        result += "0";
+                    }
+                }
+                
+            }
+            return result;
+        }
+
+        public byte ConvertBinaryToByte(string octet)
+        {
+            int result = 0;
+
+            if (octet.Length == 8)
+            {   
+                for (int i = 0; i < 8; i++)
+                {
+                    result += Convert.ToInt32(octet[i] + "") * (int)Math.Pow(2, 7 - i);
+                }
+            }
+            return Convert.ToByte(result);
         }
 
         /// <summary>

@@ -47,7 +47,7 @@ namespace LectureImage
             0 0 4 230 = 230*250^0 + 4*256^1+0*256^2+0*256^3
             */
 
-            //MyImage image = new MyImage("./Images/Coco.bmp");
+            MyImage image = new MyImage("./Images/Lac.bmp");
             //image.NoirEtBlanc();
             //image.DetectionContour();
             //image.FlouUniforme();
@@ -55,17 +55,20 @@ namespace LectureImage
             //image.RenforcementBords();
             //Console.WriteLine(image.toString());
 
-            MyImage image = new MyImage(1000);
-            image.Fractale();
-            byte[] myFile = image.From_Image_To_File();
+            MyImage imageCachee = new MyImage("./Images/Coco.bmp");
+            //MyImage image = new MyImage(1000);
+            // image.Fractale();
 
-            for(int i = 0; i < 54; i++)
-            {
-                Console.WriteLine(i + ": " + myFile[i]);
-            }
+            image.CacherImage(imageCachee.Matrice);
+            image.RetrouverImage();
+            byte[] myFile = image.From_Image_To_File();
+            byte[] myFile2 = imageCachee.From_Image_To_File();
+
 
             File.WriteAllBytes("Sortie.bmp", myFile);
+            File.WriteAllBytes("Sortie2.bmp", myFile2);
             Process.Start("Sortie.bmp");
+            //Process.Start("Sortie2.bmp");
             Console.WriteLine("Press any key to exit!");
             Console.ReadLine();
         }
