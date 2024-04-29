@@ -150,6 +150,9 @@ namespace LectureImage
             }
         }
 
+        /// <summary>
+        /// Retrouve une image cachée dans une autre
+        /// </summary>
         public void RetrouverImage()
         {
             for (int i = 0; i < matrice.GetLength(0); i++)
@@ -237,6 +240,12 @@ namespace LectureImage
                 }
             }
         }
+
+        /// <summary>
+        /// Convertis un chiffre inférieur à 16 en binaire
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
         public string ConvertSemiByteToBinary(int value)
         {
             int valInt = Convert.ToInt32(value);
@@ -262,6 +271,11 @@ namespace LectureImage
             return result;
         }
 
+        /// <summary>
+        /// Convertis un octet en binaire
+        /// </summary>
+        /// <param name="octet"></param>
+        /// <returns></returns>
         public byte ConvertBinaryToByte(string octet)
         {
             int result = 0;
@@ -435,6 +449,9 @@ namespace LectureImage
             }
         }
 
+        /// <summary>
+        /// Applique le filtre de repoussage
+        /// </summary>
         public void Repoussage()
         {
             int[,] noyau = { { -2, -1, 0 }, { -1, 1, 1 }, { 0, 1, 2 } };
@@ -453,6 +470,9 @@ namespace LectureImage
             matrice = matriceCopy;
         }
 
+        /// <summary>
+        /// Applique le filtre de renforcement
+        /// </summary>
         public void RenforcementBords()
         {
             int[,] noyau = { { 0, 0, 0 }, { -1, 1, 0 }, { 0, 0, 0 } };
@@ -471,7 +491,9 @@ namespace LectureImage
             matrice = matriceCopy;
         }
 
-
+        /// <summary>
+        /// Applique le filtre de détection de contours
+        /// </summary>
         public void DetectionContour()
         {
             int[,] noyau = { { -1, -1, -1 }, { -1, 8, -1 }, { -1, -1, -1 } };
@@ -490,6 +512,9 @@ namespace LectureImage
             matrice = matriceCopy;
         }
 
+        /// <summary>
+        /// Applique le filtre de flou uniforme
+        /// </summary>
         public void FlouUniforme()
         {
             int[,] noyau = { { 1, 1, 1 }, { 1, 1, 1 }, { 1, 1, 1 } };
@@ -508,6 +533,13 @@ namespace LectureImage
             matrice = matriceCopy;
         }
 
+        /// <summary>
+        /// Calcul de la valeur du nouveau pixel pour la convolution
+        /// </summary>
+        /// <param name="matriceExtraite"></param>
+        /// <param name="noyau"></param>
+        /// <param name="div"></param>
+        /// <returns></returns>
         public (byte, byte, byte) CalculerNouveauPixel((byte, byte, byte)[,] matriceExtraite, int[,] noyau, double div)
         {
             double sum1 = 0;
@@ -535,6 +567,13 @@ namespace LectureImage
             return nouveauPixel;
         }
 
+        /// <summary>
+        /// Extrait une matrice 3x3 de la taille du noyau pour la convolution
+        /// </summary>
+        /// <param name="matriceCopy"></param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <returns></returns>
         public (byte, byte, byte)[,] ExtraireMatrice((byte, byte, byte)[,] matriceCopy, int i, int j)
         {
             (byte, byte, byte)[,] matriceExtraite = new (byte, byte, byte)[3, 3];
@@ -561,6 +600,13 @@ namespace LectureImage
             return matriceExtraite;
         }
 
+        /// <summary>
+        /// Extrait une matrice 5x5 de la taille du noyau pour la convolution
+        /// </summary>
+        /// <param name="matriceCopy"></param>
+        /// <param name="i"></param>
+        /// <param name="j"></param>
+        /// <returns></returns>
         public (byte, byte, byte)[,] ExtraireMatrice5x5((byte, byte, byte)[,] matriceCopy, int i, int j)
         {
             (byte, byte, byte)[,] matriceExtraite = new (byte, byte, byte)[5, 5];
@@ -582,6 +628,7 @@ namespace LectureImage
             }
             return matriceExtraite;
         }
+
 
         public int Convertir_Endian_to_Int(byte[] tab, int start, int end)
         {
@@ -628,6 +675,10 @@ namespace LectureImage
             return tab;
         }
 
+        /// <summary>
+        /// Convertis l'image en tableau simple de byte
+        /// </summary>
+        /// <returns></returns>
         public byte[] From_Image_To_File()
         {
             // Création du fichier
