@@ -56,11 +56,13 @@ namespace LectureImage
                 Console.WriteLine("3. ROTATION");
                 Console.WriteLine("4. FILTRES");
                 Console.WriteLine("5. CACHER IMAGE");
-                Console.WriteLine("6. FRACTALE");
-                Console.WriteLine("7. HUFFMANN");
+                Console.WriteLine("6. RETROUVER IMAGE");
+                Console.WriteLine("7. FRACTALE");
+                Console.WriteLine("8. HUFFMANN");
+                Console.WriteLine("9. INNOVATION");
                 Console.WriteLine("0. Quitter");
 
-                int choix = DemanderEntier("Entrez le numéro de la catégorie :", 0, 7);
+                int choix = DemanderEntier("Entrez le numéro de la catégorie :", 0, 9);
 
                 switch (choix)
                 {
@@ -119,6 +121,18 @@ namespace LectureImage
                         break;
                     case 6:
                         Console.Clear();
+
+                        image.RetrouverImage();
+                        byte[] myFile6 = image.From_Image_To_File();
+                        File.WriteAllBytes("Sortie.bmp", myFile6);
+                        Process.Start("Sortie.bmp");
+
+                        Console.WriteLine("Image retrouvée avec succès.");
+                        Console.WriteLine("Appuyez sur une touche pour revenir au menu principal.");
+                        Console.ReadKey();
+                        break;
+                    case 7:
+                        Console.Clear();
                         int taille = DemanderEntier("Entrez la taille :");
 
                         MyImage image2 = new MyImage(taille);
@@ -131,8 +145,20 @@ namespace LectureImage
                         Console.WriteLine("Appuyez sur une touche pour revenir au menu principal.");
                         Console.ReadKey();
                         break;
-                    case 7:
+                    case 8:
                         //METTRE CODE HUFFMANN
+                        break;
+                    case 9:
+                        Console.Clear();
+
+                        image.InverserCouleurs();
+                        byte[] myFile7 = image.From_Image_To_File();
+                        File.WriteAllBytes("Sortie.bmp", myFile7);
+                        Process.Start("Sortie.bmp");
+
+                        Console.WriteLine("Application de l'innovation !");
+                        Console.WriteLine("Appuyez sur une touche pour revenir au menu principal.");
+                        Console.ReadKey();
                         break;
                     case 0:
                         quitter = true;

@@ -43,6 +43,12 @@ namespace LectureImage
             get { return matrice; }
         }
 
+        public (byte, byte, byte)[,] MatriceModifiee
+        {
+            get { return matriceModifiee; }
+
+        }
+
         /// <summary>
         /// Constructeur lors d'une extraction d'image
         /// </summary>
@@ -107,6 +113,8 @@ namespace LectureImage
                     matrice[j, k] = color;
                 }
             }
+            matriceModifiee = new (byte, byte, byte)[hauteur, largeur];
+            matriceModifiee = matrice;
         }
 
         /// <summary>
@@ -146,6 +154,17 @@ namespace LectureImage
                 for (int k = 0; k < matrice.GetLength(1); k++)
                 {
                     matrice[j, k] = (255,255,255);
+                }
+            }
+        }
+
+        public void InverserCouleurs()
+        {
+            for(int i = 0; i < hauteur; i++) {
+                for(int j = 0; j < largeur; j++ )
+                {
+                    (byte, byte, byte) newPixel = ((byte)(255 - matrice[i, j].Item1), (byte)(255 - matrice[i, j].Item2), (byte)(255 - matrice[i, j].Item3));
+                    matrice[i, j] = newPixel;
                 }
             }
         }
@@ -381,19 +400,6 @@ namespace LectureImage
                     }
                 }
             }
-            //for(int i = 0; i < hauteur; i++) {
-            //    for(int j = 0; j < largeur; j++)
-            //    {
-                    
-            //        for(int k = (i - 2 >= 0) ? i - 2 : (i - 1 >= 0) ? i - 1 : i; 
-            //            i < hauteur || i <) { 
-            //            for(int l = (j - 2 >= 0) ? j - 2 : (j - 1 >= 0) ? j - 1 : j)
-            //            {
-
-            //            }
-            //        }
-            //    }
-            //}
             matrice = rotatedImageData;
         }
 
@@ -447,6 +453,7 @@ namespace LectureImage
                     matrice[i, j] = nouveauPixel;
                 }
             }
+
         }
 
         /// <summary>
